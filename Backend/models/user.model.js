@@ -30,7 +30,6 @@ userSchema.methods.isValidPassword = async function (password) {
 userSchema.methods.generateJWT = function () {
 
     // console.log(password, this.password)
-
     return jwt.sign({ email: this.email }, process.env.JWT_SECRET);
 }
 
