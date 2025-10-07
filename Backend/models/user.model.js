@@ -4,13 +4,13 @@ import jwt from 'jsonwebtoken';
 
 const userSchema = new mongoose.Schema({
     email: {
-        type:String,
+        type: String,
         required: true,
         unique: true,
         trim: true,
         lowercase: true,
-        minLength: [ 3, 'Email must be at least 6 character long'],
-        maxLength: [ 50, 'Email must not be longer than 50 characters']
+        minLength: [3, 'Email must be at least 6 character long'],
+        maxLength: [50, 'Email must not be longer than 50 characters']
     },
 
     password: {
@@ -30,7 +30,10 @@ userSchema.methods.isValidPassword = async function (password) {
 userSchema.methods.generateJWT = function () {
 
     // console.log(password, this.password)
-    return jwt.sign({ email: this.email }, process.env.JWT_SECRET);
+    return jwt.sign({ email: this.email }, 
+        process.env.JWT_SECRET, 
+        { expiresIn: '24h' }
+    );
 }
 
 const User = mongoose.model('user', userSchema)
