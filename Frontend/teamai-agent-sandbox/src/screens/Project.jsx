@@ -12,19 +12,20 @@ const Project = () => {
     const [isSidePanelOpen, setIsSidePanelOpen] = useState(false)
     const [isModalOpen, setIsModalOpen] = useState(false)
     const [selectedUserId, setSelectedUserId] = useState([])
+    const [project, setProject] = useState(location.state.project);
 
     const [users, setUsers] = useState([]);
 
     const handleUserClick = (id) => {
         setSelectedUserId(prevSelectedUserId => {
             const newSelectedUserId = new Set(prevSelectedUserId);
-            if(newSelectedUserId.has(id)) {
+            if (newSelectedUserId.has(id)) {
                 newSelectedUserId.delete(id);
             }
             else {
                 newSelectedUserId.add(id)
             }
-            console.log(Array.from(newSelectedUserId))
+            // console.log(Array.from(newSelectedUserId))
             return newSelectedUserId;
         })
     }
@@ -32,7 +33,7 @@ const Project = () => {
     // console.log(location.state)
 
     const addCollaborators = () => {
-        
+
         axios.put("/projects/add-user", {
             projectId: location.state.project._id,
             users: Array.from(selectedUserId)
@@ -45,14 +46,19 @@ const Project = () => {
     }
 
     useEffect(() => {
-        
+
+        axios.get(`/projects/get-project/${location.state.project._id}`).then(res => {
+            console.log(res.data.project)
+            setProject(res.data.project);
+        })
+
         axios.get('/users/all').then(res => {
             setUsers(res.data.users)
         })
 
-        .catch((err) => {
-            console.log(err);
-        })
+            .catch((err) => {
+                console.log(err);
+            })
 
     }, [])
 
@@ -114,9 +120,13 @@ const Project = () => {
 
                 <div className={`sidePanel w-full h-full flex flex-col gap-2 bg-slate-50 absolute transition-all ${isSidePanelOpen ? 'translate-x-0' : '-translate-x-full'} top-0`}>
 
+
                     <header
-                        className='flex justify-end px-3 bg-slate-200'
+                        className='flex justify-between items-center  px-3 bg-slate-200'
                     >
+                        <h1
+                            className='font-semibold'
+                        >Collaborators</h1>
                         <button
                             onClick={() => setIsSidePanelOpen(!isSidePanelOpen)}
                             className='p-2'
@@ -127,17 +137,16 @@ const Project = () => {
 
                     <div className='users'>
 
-                        <div className='user flex gap-2 items-center cursor-pointer hover:bg-slate-200 p-2'>
-
-                            <div className='aspect-square rounded-full h-fit w-fit bg-slate-600 flex items-center justify-center p-5 text-white'>
-                                <i className="ri-user-3-fill absolute"></i>
-                            </div>
-
-                            <h1
-                                className='font-semibold text-lg'
-                            >username</h1>
-
-                        </div>
+                        {project.users && project.users.map(user => {
+                            return (
+                                <div className='user cursor-pointer hover:bg-slate-200 p-2 flex gap-2 items-center'>
+                                    <div className='aspect-square rounded-full w-fit h-fit flex items-center justify-center p-5 text-white bg-slate-600'>
+                                        <i className="ri-user-fill absolute"></i>
+                                    </div>
+                                    <h1 className='font-semibold text-lg'>{user.email}</h1>
+                                </div>
+                            )
+                        })}
 
                     </div>
 
@@ -158,7 +167,7 @@ const Project = () => {
 
                         <div className='users-list flex flex-col gap-2 mb-16 max-h-96 overflow-auto'>
                             {users.map(user => (
-                                <div key={user._id} className={`user cursor-pointer hover:bg-slate-200 ${Array.from(selectedUserId).indexOf(user._id)!=-1 ? 'bg-slate-200' : ""} p-2 flex gap-2 items-center`} onClick={() => handleUserClick(user._id)}>
+                                <div key={user._id} className={`user cursor-pointer hover:bg-slate-200 ${Array.from(selectedUserId).indexOf(user._id) != -1 ? 'bg-slate-200' : ""} p-2 flex gap-2 items-center`} onClick={() => handleUserClick(user._id)}>
                                     <div className='aspect-square relative rounded-full w-fit h-fit flex items-center justify-center p-5 text-white bg-slate-600'>
                                         <i className="ri-user-fill absolute"></i>
                                     </div>
