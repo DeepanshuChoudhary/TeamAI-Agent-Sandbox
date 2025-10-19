@@ -1,7 +1,8 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useContext } from 'react';
 import { useLocation } from 'react-router-dom'
 import axios from "../config/axios";
-
+import { initializeSocket, receiveMessage, sendMessage } from '../config/socket.js';
+import { UserContext } from '../context/user.context.jsx'
 
 const Project = () => {
 
@@ -13,6 +14,8 @@ const Project = () => {
     const [isModalOpen, setIsModalOpen] = useState(false)
     const [selectedUserId, setSelectedUserId] = useState([])
     const [project, setProject] = useState(location.state.project);
+    const [message, setMessage] = useState('');
+    const { user } = useContext(UserContext);
 
     const [users, setUsers] = useState([]);
 
@@ -45,7 +48,25 @@ const Project = () => {
         })
     }
 
+    const send = () => {
+        
+        console.log(user)
+
+        sendMessage('project-message', {
+            message,
+            sender: user._id
+        })
+
+        setMessage("")
+    }
+    
     useEffect(() => {
+
+        initializeSocket(project._id);
+
+        receiveMessage('project-message', data => {
+            console.log(data);
+        })
 
         axios.get(`/projects/get-project/${location.state.project._id}`).then(res => {
             console.log(res.data.project)
@@ -63,6 +84,7 @@ const Project = () => {
     }, [])
 
     // console.log(location.state);
+
 
     return (
 
@@ -110,8 +132,13 @@ const Project = () => {
                     </div>
 
                     <div className='inputField flex flex-nowrap'>
-                        <input type='text' className='bg-white p-2 px-4 border-none outline-none min-w-5 flex-grow' placeholder='Enter message' />
+                        <input
+                            value={message}
+                            onChange={(e) => setMessage(e.target.value)}
+                            type='text' 
+                            className='bg-white p-2 px-4 border-none outline-none min-w-5 flex-grow' placeholder='Enter message' />
                         <button
+                            onClick={send}
                             className='px-5 bg-slate-950 text-white'
                         ><i className="ri-send-plane-fill"></i></button>
                     </div>
@@ -139,7 +166,10 @@ const Project = () => {
 
                         {project.users && project.users.map(user => {
                             return (
-                                <div className='user cursor-pointer hover:bg-slate-200 p-2 flex gap-2 items-center'>
+                                <div
+                                    key={user._id} 
+                                    className='user cursor-pointer hover:bg-slate-200 p-2 flex gap-2 items-center'
+                                >
                                     <div className='aspect-square rounded-full w-fit h-fit flex items-center justify-center p-5 text-white bg-slate-600'>
                                         <i className="ri-user-fill absolute"></i>
                                     </div>
@@ -147,6 +177,7 @@ const Project = () => {
                                 </div>
                             )
                         })}
+
 
                     </div>
 

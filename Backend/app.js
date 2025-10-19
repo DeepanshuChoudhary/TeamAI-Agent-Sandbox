@@ -17,7 +17,7 @@ app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 
 app.use('/users', userRoutes);
-app.use('/projects', projectRoutes)
+app.use('/projects', projectRoutes);
 
 app.get('/', (req,res) => {
     res.send('Hello world')
