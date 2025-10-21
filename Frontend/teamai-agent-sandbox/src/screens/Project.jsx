@@ -50,7 +50,7 @@ const Project = () => {
     }
 
     const send = () => {
-        
+
         // console.log(user)
 
         sendMessage('project-message', {
@@ -62,15 +62,17 @@ const Project = () => {
 
         setMessage("")
     }
-    
+
     useEffect(() => {
 
         initializeSocket(project._id);
 
-        receiveMessage('project-message', data => {
+        const handleMessage = (data) => {
             console.log(data);
             appendIncomingMessage(data)
-        })
+        }
+
+        receiveMessage('project-message', handleMessage);
 
         axios.get(`/projects/get-project/${location.state.project._id}`).then(res => {
             console.log(res.data.project)
@@ -79,40 +81,43 @@ const Project = () => {
 
         axios.get('/users/all').then(res => {
             setUsers(res.data.users)
+        }).catch((err) => {
+            console.log(err);
         })
 
-            .catch((err) => {
-                console.log(err);
-            })
-
-    }, [])
+    }, []);
 
     // console.log(location.state);
 
     const appendIncomingMessage = (messageObject) => {
-
         const messageBox = document.querySelector('.message-box');
 
         const message = document.createElement('div')
-        message.classList.add('message', 'max-w-56', 'flex', 'flex-col', 'p-2', 'bg-slate-500')
+        message.classList.add('message', 'max-w-56', 'flex', 'flex-col', 'p-2', 'bg-slate-500', 'break-words')
         message.innerHTML = `
-            <small class = 'opacity-65 text-xs'> ${messageObject.sender.email}</small>
-            <p class='text-sm'>${messageObject.message}</p>
-        `
+        <small class='opacity-65 text-xs'>${messageObject.sender.email}</small>
+        <p class='text-sm'>${messageObject.message}</p>
+    `
         messageBox.appendChild(message);
+        scrollToBottom();
     }
 
     const appendOutgoingMessage = (message) => {
-
         const messageBox = document.querySelector('.message-box');
 
         const newMessage = document.createElement('div');
-        newMessage.classList.add('ml-auto', 'message', 'flex-col', 'p-2', 'bg-slate-500')
+        newMessage.classList.add('ml-auto', 'message', 'max-w-56', 'flex', 'flex-col', 'p-2', 'bg-slate-500', 'break-words')
         newMessage.innerHTML = `
-            <small class='opacity-65 text-xs'>${user.email}</small>
-            <p class='text-sm'>${message}</p>
-        `
+        <small class='opacity-65 text-xs'>${user.email}</small>
+        <p class='text-sm'>${message}</p>
+    `
         messageBox.appendChild(newMessage);
+        scrollToBottom();
+    }
+
+
+    const scrollToBottom = () => {
+        messageBox.current.scrollTop = messageBox.current.scrollHeight
     }
 
     return (
@@ -140,11 +145,11 @@ const Project = () => {
 
                 </header>
 
-                <div className='conversation-area flex-grow flex flex-col'>
+                <div className='conversation-area flex-grow flex flex-col overflow-auto'>
 
-                    <div 
+                    <div
                         ref={messageBox}
-                        className='message-box flex-grow flex flex-col gap-2 p-2'>
+                        className='message-box flex-grow flex flex-col gap-2 p-2 overflow-auto [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none] scroll-smooth'>
 
                         {/* <div className='incoming message flex flex-col p-2 bg-slate-50 max-w-54 rounded-md'>
                             <small className='opacity-65 text-xs'>example@gmail.com</small>
@@ -166,7 +171,7 @@ const Project = () => {
                         <input
                             value={message}
                             onChange={(e) => setMessage(e.target.value)}
-                            type='text' 
+                            type='text'
                             className='bg-white p-2 px-4 border-none outline-none min-w-5 flex-grow' placeholder='Enter message' />
                         <button
                             onClick={send}
@@ -198,7 +203,7 @@ const Project = () => {
                         {project.users && project.users.map(user => {
                             return (
                                 <div
-                                    key={user._id} 
+                                    key={user._id}
                                     className='user cursor-pointer hover:bg-slate-200 p-2 flex gap-2 items-center'
                                 >
                                     <div className='aspect-square rounded-full w-fit h-fit flex items-center justify-center p-5 text-white bg-slate-600'>
