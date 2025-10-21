@@ -16,6 +16,7 @@ const Project = () => {
     const [project, setProject] = useState(location.state.project);
     const [message, setMessage] = useState('');
     const { user } = useContext(UserContext);
+    const messageBox = React.createRef();
 
     const [users, setUsers] = useState([]);
 
@@ -50,12 +51,14 @@ const Project = () => {
 
     const send = () => {
         
-        console.log(user)
+        // console.log(user)
 
         sendMessage('project-message', {
             message,
-            sender: user._id
+            sender: user
         })
+
+        appendOutgoingMessage(message);
 
         setMessage("")
     }
@@ -66,6 +69,7 @@ const Project = () => {
 
         receiveMessage('project-message', data => {
             console.log(data);
+            appendIncomingMessage(data)
         })
 
         axios.get(`/projects/get-project/${location.state.project._id}`).then(res => {
@@ -85,6 +89,31 @@ const Project = () => {
 
     // console.log(location.state);
 
+    const appendIncomingMessage = (messageObject) => {
+
+        const messageBox = document.querySelector('.message-box');
+
+        const message = document.createElement('div')
+        message.classList.add('message', 'max-w-56', 'flex', 'flex-col', 'p-2', 'bg-slate-500')
+        message.innerHTML = `
+            <small class = 'opacity-65 text-xs'> ${messageObject.sender.email}</small>
+            <p class='text-sm'>${messageObject.message}</p>
+        `
+        messageBox.appendChild(message);
+    }
+
+    const appendOutgoingMessage = (message) => {
+
+        const messageBox = document.querySelector('.message-box');
+
+        const newMessage = document.createElement('div');
+        newMessage.classList.add('ml-auto', 'message', 'flex-col', 'p-2', 'bg-slate-500')
+        newMessage.innerHTML = `
+            <small class='opacity-65 text-xs'>${user.email}</small>
+            <p class='text-sm'>${message}</p>
+        `
+        messageBox.appendChild(newMessage);
+    }
 
     return (
 
@@ -113,9 +142,11 @@ const Project = () => {
 
                 <div className='conversation-area flex-grow flex flex-col'>
 
-                    <div className='message-box flex-grow flex flex-col gap-2 p-2'>
+                    <div 
+                        ref={messageBox}
+                        className='message-box flex-grow flex flex-col gap-2 p-2'>
 
-                        <div className='incoming message flex flex-col p-2 bg-slate-50 max-w-54 rounded-md'>
+                        {/* <div className='incoming message flex flex-col p-2 bg-slate-50 max-w-54 rounded-md'>
                             <small className='opacity-65 text-xs'>example@gmail.com</small>
                             <p className='text-sm'>
                                 hello world this is Deepanshu Choudhary I am a software developer
@@ -127,7 +158,7 @@ const Project = () => {
                             <p className='text-sm'>
                                 hello world this is Deepanshu Nagar I am a software developer
                             </p>
-                        </div>
+                        </div> */}
 
                     </div>
 
