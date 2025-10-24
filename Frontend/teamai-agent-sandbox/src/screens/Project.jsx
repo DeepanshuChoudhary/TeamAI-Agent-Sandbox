@@ -92,8 +92,15 @@ const Project = () => {
     const appendIncomingMessage = (messageObject) => {
         const messageBox = document.querySelector('.message-box');
 
+        const isOwnMessage = messageObject.sender._id === user._id;
+
         const message = document.createElement('div')
-        message.classList.add('message', 'max-w-56', 'flex', 'flex-col', 'p-2', 'bg-slate-500', 'break-words')
+        // message.classList.add('message', 'max-w-56', 'flex', 'flex-col', 'p-2', 'bg-slate-500', 'break-words')
+        if (isOwnMessage) {
+            message.classList.add('ml-auto', 'message', 'max-w-56', 'flex', 'flex-col', 'p-2', 'bg-slate-500', 'break-words')
+        } else {
+            message.classList.add('message', 'max-w-56', 'flex', 'flex-col', 'p-2', 'bg-slate-500', 'break-words')
+        }
         message.innerHTML = `
         <small class='opacity-65 text-xs'>${messageObject.sender.email}</small>
         <p class='text-sm'>${messageObject.message}</p>

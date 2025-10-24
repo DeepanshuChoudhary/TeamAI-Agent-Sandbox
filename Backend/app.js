@@ -4,6 +4,7 @@ import connectdb from './db/db.js';
 import userRoutes from './routes/user.routes.js';
 import projectRoutes from './routes/project.routes.js';
 import cookieParser from 'cookie-parser';
+import aiRoutes from './routes/ai.routes.js'
 import cors from 'cors'
 
 connectdb();
@@ -15,6 +16,7 @@ app.use(morgan('dev'));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
+app.use('/ai', aiRoutes)
 
 app.use('/users', userRoutes);
 app.use('/projects', projectRoutes);
