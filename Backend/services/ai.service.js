@@ -1,9 +1,14 @@
-import { GoogleGenerativeAI } from "@google/generative-ai"; 
+import { GoogleGenAI } from "@google/genai";
 
-const genAI = new GoogleGenerativeAI(process.env.GOOGLE_AI_KEY);
-const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
+const ai = new GoogleGenAI({
+    apiKey: process.env.GOOGLE_AI_KEY
+});
 
 export const generateResult = async (prompt) => {
-    const result = await model.generateContent(prompt);
-    return result.response.text();
+    const response = await ai.models.generateContent({
+        model: "gemini-2.5-flash",
+        contents: prompt
+    });
+    // console.log(response.text);
+    return response.text;
 }
