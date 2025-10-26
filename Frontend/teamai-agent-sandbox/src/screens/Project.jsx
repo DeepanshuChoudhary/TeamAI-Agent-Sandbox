@@ -221,7 +221,7 @@ const Project = () => {
 
                 </div>
 
-                <div className={`sidePanel w - full h-full flex flex - col gap - 2 bg - slate - 50 absolute transition - all ${ isSidePanelOpen ? 'translate-x-0' : '-translate-x-full' } top - 0`}>
+                <div className={`sidePanel w-full h-full flex flex-col gap-2 bg-slate-50 absolute transition - all ${ isSidePanelOpen ? 'translate-x-0' : '-translate-x-full' } top - 0`}>
 
 
                     <header
