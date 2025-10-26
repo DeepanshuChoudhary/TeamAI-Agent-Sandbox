@@ -3,6 +3,7 @@ import { useLocation } from 'react-router-dom'
 import axios from "../config/axios";
 import { initializeSocket, receiveMessage, sendMessage } from '../config/socket.js';
 import { UserContext } from '../context/user.context.jsx'
+import Markdown from 'markdown-to-jsx';
 
 const Project = () => {
 
@@ -17,8 +18,9 @@ const Project = () => {
     const [message, setMessage] = useState('');
     const { user } = useContext(UserContext);
     const messageBox = React.createRef();
-
+    
     const [users, setUsers] = useState([]);
+    const [messages, setMessages] = useState([]);
 
     const handleUserClick = (id) => {
         setSelectedUserId(prevSelectedUserId => {
@@ -58,8 +60,8 @@ const Project = () => {
             sender: user
         })
 
-        appendOutgoingMessage(message);
-
+        // appendOutgoingMessage(message);
+        setMessages(prevMessages => [ ...prevMessages, { sender: user, message } ])
         setMessage("")
     }
 
@@ -68,8 +70,9 @@ const Project = () => {
         initializeSocket(project._id);
 
         const handleMessage = (data) => {
-            console.log(data);
-            appendIncomingMessage(data)
+            // console.log(data);
+            // appendIncomingMessage(data)
+            setMessages(prevMessages => [ ...prevMessages, data ]);
         }
 
         receiveMessage('project-message', handleMessage);
@@ -89,39 +92,56 @@ const Project = () => {
 
     // console.log(location.state);
 
-    const appendIncomingMessage = (messageObject) => {
-        const messageBox = document.querySelector('.message-box');
+    // const appendIncomingMessage = (messageObject) => {
+    //     const messageBox = document.querySelector('.message-box');
 
-        const isOwnMessage = messageObject.sender._id === user._id;
+    //     // const isOwnMessage = messageObject.sender._id === user._id;
 
-        const message = document.createElement('div')
-        // message.classList.add('message', 'max-w-56', 'flex', 'flex-col', 'p-2', 'bg-slate-500', 'break-words')
-        if (isOwnMessage) {
-            message.classList.add('ml-auto', 'message', 'max-w-56', 'flex', 'flex-col', 'p-2', 'bg-slate-500', 'break-words')
-        } else {
-            message.classList.add('message', 'max-w-56', 'flex', 'flex-col', 'p-2', 'bg-slate-500', 'break-words')
-        }
-        message.innerHTML = `
-        <small class='opacity-65 text-xs'>${messageObject.sender.email}</small>
-        <p class='text-sm'>${messageObject.message}</p>
-    `
-        messageBox.appendChild(message);
+    //     const message = document.createElement('div')
+    //     // if (isOwnMessage) {
+    //     //     message.classList.add('ml-auto', 'message', 'max-w-56', 'flex', 'flex-col', 'p-2', 'bg-slate-500', 'break-words')
+    //     // } else {
+    //     //     message.classList.add('message', 'max-w-56', 'flex', 'flex-col', 'p-2', 'bg-slate-500', 'break-words')
+    //     // }
+
+    //     message.classList.add('message', 'max-w-56', 'flex', 'flex-col', 'p-2', 'bg-slate-500', 'break-words')
+
+    //     if (messageObject.sender._id === 'ai') {
+    //         const markDown = (<Markdown>{messageObject.message}</Markdown>)
+    //         message.innerHTML = `
+    //             <small class='opacity-65 text-xs'>
+    //                 ${messageObject.sender.email}
+    //             </small>
+    //             <p class='text-sm'>${markDown}</p>
+    //         `
+    //     }
+    //     else {
+    //         message.innerHTML = `
+    //         <small class='opacity-65 text-xs'>${messageObject.sender.email}</small>
+    //         <p class='text-sm'>${messageObject.message}</p>
+    //         `
+    //     }
+    
+    //     messageBox.appendChild(message);
+    //     scrollToBottom();
+    // }
+
+    // const appendOutgoingMessage = (message) => {
+    //     const messageBox = document.querySelector('.message-box');
+
+    //     const newMessage = document.createElement('div');
+    //     newMessage.classList.add('ml-auto', 'message', 'max-w-56', 'flex', 'flex-col', 'p-2', 'bg-slate-500', 'break-words')
+    //     newMessage.innerHTML = `
+    //             < small class='opacity-65 text-xs' > ${ user.email }</ >
+    //                 <p class='text-sm'>${message}</p>
+    //         `
+    //     messageBox.appendChild(newMessage);
+    //     scrollToBottom();
+    // }
+
+    useEffect(() => {
         scrollToBottom();
-    }
-
-    const appendOutgoingMessage = (message) => {
-        const messageBox = document.querySelector('.message-box');
-
-        const newMessage = document.createElement('div');
-        newMessage.classList.add('ml-auto', 'message', 'max-w-56', 'flex', 'flex-col', 'p-2', 'bg-slate-500', 'break-words')
-        newMessage.innerHTML = `
-        <small class='opacity-65 text-xs'>${user.email}</small>
-        <p class='text-sm'>${message}</p>
-    `
-        messageBox.appendChild(newMessage);
-        scrollToBottom();
-    }
-
+    }, [messages]);
 
     const scrollToBottom = () => {
         messageBox.current.scrollTop = messageBox.current.scrollHeight
@@ -154,23 +174,36 @@ const Project = () => {
 
                 <div className='conversation-area flex-grow flex flex-col overflow-auto'>
 
+                    {/* <div
+                        ref={messageBox}
+                        className='message-box flex-grow flex flex-col gap-2 p-2 overflow-auto [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none] scroll-smooth'>
+
+                    </div> */}
+
                     <div
                         ref={messageBox}
                         className='message-box flex-grow flex flex-col gap-2 p-2 overflow-auto [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none] scroll-smooth'>
 
-                        {/* <div className='incoming message flex flex-col p-2 bg-slate-50 max-w-54 rounded-md'>
-                            <small className='opacity-65 text-xs'>example@gmail.com</small>
-                            <p className='text-sm'>
-                                hello world this is Deepanshu Choudhary I am a software developer
-                            </p>
-                        </div>
-
-                        <div className='incoming message flex flex-col p-2 bg-slate-50 max-w-54 rounded-md ml-auto'>
-                            <small className='opacity-65 text-xs'>example@gmail.com</small>
-                            <p className='text-sm'>
-                                hello world this is Deepanshu Nagar I am a software developer
-                            </p>
-                        </div> */}
+                        {messages.map((msg, index) => (
+                            <div 
+                                key={index} 
+                                className={`message max-w-56 flex flex-col p-2 bg-slate-50 rounded-md ${
+                                    msg.sender._id === user._id ? 'ml-auto' : ''
+                                }`}
+                            >
+                                <small className='opacity-65 text-xs'>
+                                    {msg.sender.email}
+                                </small>
+                                
+                                <div className='text-sm'>
+                                    {msg.sender._id === 'ai' ? (
+                                        <Markdown>{msg.message}</Markdown>
+                                    ) : (
+                                        <p>{msg.message}</p>
+                                    )}
+                                </div>
+                            </div>
+                        ))}
 
                     </div>
 
@@ -188,7 +221,7 @@ const Project = () => {
 
                 </div>
 
-                <div className={`sidePanel w-full h-full flex flex-col gap-2 bg-slate-50 absolute transition-all ${isSidePanelOpen ? 'translate-x-0' : '-translate-x-full'} top-0`}>
+                <div className={`sidePanel w - full h-full flex flex - col gap - 2 bg - slate - 50 absolute transition - all ${ isSidePanelOpen ? 'translate-x-0' : '-translate-x-full' } top - 0`}>
 
 
                     <header
@@ -241,7 +274,7 @@ const Project = () => {
 
                         <div className='users-list flex flex-col gap-2 mb-16 max-h-96 overflow-auto'>
                             {users.map(user => (
-                                <div key={user._id} className={`user cursor-pointer hover:bg-slate-200 ${Array.from(selectedUserId).indexOf(user._id) != -1 ? 'bg-slate-200' : ""} p-2 flex gap-2 items-center`} onClick={() => handleUserClick(user._id)}>
+                                <div key={user._id} className={`user cursor-pointer hover: bg - slate - 200 ${ Array.from(selectedUserId).indexOf(user._id) != -1 ? 'bg-slate-200' : "" } p - 2 flex gap - 2 items - center`} onClick={() => handleUserClick(user._id)}>
                                     <div className='aspect-square relative rounded-full w-fit h-fit flex items-center justify-center p-5 text-white bg-slate-600'>
                                         <i className="ri-user-fill absolute"></i>
                                     </div>
