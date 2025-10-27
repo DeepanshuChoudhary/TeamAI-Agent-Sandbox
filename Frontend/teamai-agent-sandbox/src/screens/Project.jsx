@@ -187,9 +187,7 @@ const Project = () => {
                         {messages.map((msg, index) => (
                             <div 
                                 key={index} 
-                                className={`message max-w-56 flex flex-col p-2 bg-slate-50 rounded-md ${
-                                    msg.sender._id === user._id ? 'ml-auto' : ''
-                                }`}
+                                className={`${msg.sender._id === 'ai' ? 'max-w-80' : 'max-w-52'} ${msg.sender._id == user._id.toString() && 'ml-auto'}  message flex flex-col p-2 bg-slate-50 w-fit rounded-md}`}
                             >
                                 <small className='opacity-65 text-xs'>
                                     {msg.sender.email}
@@ -197,7 +195,12 @@ const Project = () => {
                                 
                                 <div className='text-sm'>
                                     {msg.sender._id === 'ai' ? (
-                                        <Markdown>{msg.message}</Markdown>
+                                        <div
+                                            className='overflow-auto bg-slate-900 text-white rounded-sm p-3'
+                                        >
+                                            <Markdown>{msg.message}</Markdown>
+
+                                        </div>
                                     ) : (
                                         <p>{msg.message}</p>
                                     )}
@@ -221,7 +224,7 @@ const Project = () => {
 
                 </div>
 
-                <div className={`sidePanel w-full h-full flex flex-col gap-2 bg-slate-50 absolute transition - all ${ isSidePanelOpen ? 'translate-x-0' : '-translate-x-full' } top - 0`}>
+                <div className={`sidePanel w-full h-full flex flex-col gap-2 bg-slate-50 absolute transition - all ${ isSidePanelOpen ? 'translate-x-0' : '-translate-x-full' } top-0`}>
 
 
                     <header
