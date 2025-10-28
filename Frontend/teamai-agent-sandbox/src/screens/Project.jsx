@@ -4,6 +4,7 @@ import axios from "../config/axios";
 import { initializeSocket, receiveMessage, sendMessage } from '../config/socket.js';
 import { UserContext } from '../context/user.context.jsx'
 import Markdown from 'markdown-to-jsx';
+import { useRef } from 'react';
 
 const Project = () => {
 
@@ -37,6 +38,20 @@ const Project = () => {
     }
 
     // console.log(location.state)
+
+    const SyntaxHighlightedCode = (props) => {
+        const ref = useRef(null)
+
+        React.useEffect(() => {
+            if(ref.current && props.className?.includes('lang-') && window.hljs) {
+                window.hljs.highlightElement(ref.current)
+
+                ref.current.removeAttribute('data-highlighted')
+            }
+        },[props.className, props.children])
+
+        return <code {...props} ref={ref} />
+    }
 
     const addCollaborators = () => {
 
@@ -187,7 +202,7 @@ const Project = () => {
                         {messages.map((msg, index) => (
                             <div 
                                 key={index} 
-                                className={`${msg.sender._id === 'ai' ? 'max-w-80' : 'max-w-52'} ${msg.sender._id == user._id.toString() && 'ml-auto'}  message flex flex-col p-2 bg-slate-50 w-fit rounded-md}`}
+                                className={`${msg.sender._id === 'ai' ? 'max-w-80' : 'max-w-54'} ${msg.sender._id == user._id.toString() && 'ml-auto'}  message flex flex-col p-2 bg-slate-50 w-fit rounded-md}`}
                             >
                                 <small className='opacity-65 text-xs'>
                                     {msg.sender.email}
