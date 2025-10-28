@@ -19,9 +19,19 @@ const Project = () => {
     const [message, setMessage] = useState('');
     const { user } = useContext(UserContext);
     const messageBox = React.createRef();
-    
+
     const [users, setUsers] = useState([]);
     const [messages, setMessages] = useState([]);
+    const [fileTree, setFileTree] = useState({
+        "app.js": {
+            content: `const express = require('express');`
+        },
+        "package.json": {
+            content: `{"name":"temp-server"}`
+        }
+    })
+
+    const [currentFile, setCurrentFile] = useState(null);
 
     const handleUserClick = (id) => {
         setSelectedUserId(prevSelectedUserId => {
@@ -43,12 +53,12 @@ const Project = () => {
         const ref = useRef(null)
 
         React.useEffect(() => {
-            if(ref.current && props.className?.includes('lang-') && window.hljs) {
+            if (ref.current && props.className?.includes('lang-') && window.hljs) {
                 window.hljs.highlightElement(ref.current)
 
                 ref.current.removeAttribute('data-highlighted')
             }
-        },[props.className, props.children])
+        }, [props.className, props.children])
 
         return <code {...props} ref={ref} />
     }
@@ -76,8 +86,30 @@ const Project = () => {
         })
 
         // appendOutgoingMessage(message);
-        setMessages(prevMessages => [ ...prevMessages, { sender: user, message } ])
+        setMessages(prevMessages => [...prevMessages, { sender: user, message }])
         setMessage("")
+    }
+
+    const WriteAiMessage = (message) => {
+
+        const messageObject = JSON.parse(message)
+
+        return (
+
+            <div
+                className='overflow-auto bg-slate-900 text-white rounded-sm p-3'
+            >
+                <Markdown
+                    children={messageObject.text}
+                    options={{
+                        overrides: {
+                            code: SyntaxHighlightedCode,
+                        },
+                    }}
+                />
+
+            </div>
+        )
     }
 
     useEffect(() => {
@@ -87,7 +119,7 @@ const Project = () => {
         const handleMessage = (data) => {
             // console.log(data);
             // appendIncomingMessage(data)
-            setMessages(prevMessages => [ ...prevMessages, data ]);
+            setMessages(prevMessages => [...prevMessages, data]);
         }
 
         receiveMessage('project-message', handleMessage);
@@ -136,7 +168,7 @@ const Project = () => {
     //         <p class='text-sm'>${messageObject.message}</p>
     //         `
     //     }
-    
+
     //     messageBox.appendChild(message);
     //     scrollToBottom();
     // }
@@ -200,26 +232,20 @@ const Project = () => {
                         className='message-box flex-grow flex flex-col gap-2 p-2 overflow-auto [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none] scroll-smooth'>
 
                         {messages.map((msg, index) => (
-                            <div 
-                                key={index} 
+                            <div
+                                key={index}
                                 className={`${msg.sender._id === 'ai' ? 'max-w-80' : 'max-w-54'} ${msg.sender._id == user._id.toString() && 'ml-auto'}  message flex flex-col p-2 bg-slate-50 w-fit rounded-md}`}
                             >
                                 <small className='opacity-65 text-xs'>
                                     {msg.sender.email}
                                 </small>
-                                
-                                <div className='text-sm'>
-                                    {msg.sender._id === 'ai' ? (
-                                        <div
-                                            className='overflow-auto bg-slate-900 text-white rounded-sm p-3'
-                                        >
-                                            <Markdown>{msg.message}</Markdown>
 
-                                        </div>
-                                    ) : (
-                                        <p>{msg.message}</p>
-                                    )}
-                                </div>
+                                <p className='text-sm'>
+                                    {msg.sender._id === 'ai' ?
+
+                                        WriteAiMessage(msg.message)
+                                        : msg.message}
+                                </p>
                             </div>
                         ))}
 
@@ -239,7 +265,7 @@ const Project = () => {
 
                 </div>
 
-                <div className={`sidePanel w-full h-full flex flex-col gap-2 bg-slate-50 absolute transition - all ${ isSidePanelOpen ? 'translate-x-0' : '-translate-x-full' } top-0`}>
+                <div className={`sidePanel w-full h-full flex flex-col gap-2 bg-slate-50 absolute transition - all ${isSidePanelOpen ? 'translate-x-0' : '-translate-x-full'} top-0`}>
 
 
                     <header
@@ -279,6 +305,39 @@ const Project = () => {
 
             </section>
 
+            <section className="right bg-red-50 flex-grow h-full flex">
+
+                <div className='explorer h-full max-w-64 min-w-52 bg-slate-200'>
+                    <div className='file-tree w-full'>
+                        {
+                            Object.keys(fileTree).map((file, index) => (
+                                <div className='tree-element cursor-pointer p-2 px-4  flex items-center gap-2 bg-slate-300 w-full'>
+                                    <p
+                                        className='font-semibold text-lg'
+                                    >{file}</p>
+                                </div>
+                            ))
+                        }
+
+                    </div>
+                </div>
+                <div className='code-editor'>
+                    
+                    {
+                        currentFile && (
+                            <div className="code-editor-header flex justify-between items-center p-2 bg-slate-200">
+                                <h1 className='font-semibold text-lg'>{currentFile}</h1>
+                                <button className='p-2' onClick={() => setCurrentFile(null)}>
+                                    <i className="ri-close-fill"></i>
+                                </button>
+                            </div>
+                        )
+                    }
+
+                </div>
+
+            </section>
+
             {isModalOpen && (
                 <div className='fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center'>
                     <div className='bg-white p-4 rounded-md w-96 max-w-full relative'>
@@ -292,7 +351,7 @@ const Project = () => {
 
                         <div className='users-list flex flex-col gap-2 mb-16 max-h-96 overflow-auto'>
                             {users.map(user => (
-                                <div key={user._id} className={`user cursor-pointer hover: bg - slate - 200 ${ Array.from(selectedUserId).indexOf(user._id) != -1 ? 'bg-slate-200' : "" } p - 2 flex gap - 2 items - center`} onClick={() => handleUserClick(user._id)}>
+                                <div key={user._id} className={`user cursor-pointer hover: bg - slate - 200 ${Array.from(selectedUserId).indexOf(user._id) != -1 ? 'bg-slate-200' : ""} p - 2 flex gap - 2 items - center`} onClick={() => handleUserClick(user._id)}>
                                     <div className='aspect-square relative rounded-full w-fit h-fit flex items-center justify-center p-5 text-white bg-slate-600'>
                                         <i className="ri-user-fill absolute"></i>
                                     </div>
