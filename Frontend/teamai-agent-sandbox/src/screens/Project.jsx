@@ -311,11 +311,13 @@ const Project = () => {
                     <div className='file-tree w-full'>
                         {
                             Object.keys(fileTree).map((file, index) => (
-                                <div className='tree-element cursor-pointer p-2 px-4  flex items-center gap-2 bg-slate-300 w-full'>
+                                <button
+                                    onClick={() => setCurrentFile(file)}
+                                    className='tree-element cursor-pointer p-2 px-4  flex items-center gap-2 bg-slate-300 w-full'>
                                     <p
                                         className='font-semibold text-lg'
                                     >{file}</p>
-                                </div>
+                                </button>
                             ))
                         }
 
