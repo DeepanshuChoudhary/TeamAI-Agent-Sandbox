@@ -32,6 +32,7 @@ const Project = () => {
     })
 
     const [currentFile, setCurrentFile] = useState(null);
+    const [openFiles, setOpenFiles] = useState([]);
 
     const handleUserClick = (id) => {
         setSelectedUserId(prevSelectedUserId => {
@@ -137,54 +138,6 @@ const Project = () => {
 
     }, []);
 
-    // console.log(location.state);
-
-    // const appendIncomingMessage = (messageObject) => {
-    //     const messageBox = document.querySelector('.message-box');
-
-    //     // const isOwnMessage = messageObject.sender._id === user._id;
-
-    //     const message = document.createElement('div')
-    //     // if (isOwnMessage) {
-    //     //     message.classList.add('ml-auto', 'message', 'max-w-56', 'flex', 'flex-col', 'p-2', 'bg-slate-500', 'break-words')
-    //     // } else {
-    //     //     message.classList.add('message', 'max-w-56', 'flex', 'flex-col', 'p-2', 'bg-slate-500', 'break-words')
-    //     // }
-
-    //     message.classList.add('message', 'max-w-56', 'flex', 'flex-col', 'p-2', 'bg-slate-500', 'break-words')
-
-    //     if (messageObject.sender._id === 'ai') {
-    //         const markDown = (<Markdown>{messageObject.message}</Markdown>)
-    //         message.innerHTML = `
-    //             <small class='opacity-65 text-xs'>
-    //                 ${messageObject.sender.email}
-    //             </small>
-    //             <p class='text-sm'>${markDown}</p>
-    //         `
-    //     }
-    //     else {
-    //         message.innerHTML = `
-    //         <small class='opacity-65 text-xs'>${messageObject.sender.email}</small>
-    //         <p class='text-sm'>${messageObject.message}</p>
-    //         `
-    //     }
-
-    //     messageBox.appendChild(message);
-    //     scrollToBottom();
-    // }
-
-    // const appendOutgoingMessage = (message) => {
-    //     const messageBox = document.querySelector('.message-box');
-
-    //     const newMessage = document.createElement('div');
-    //     newMessage.classList.add('ml-auto', 'message', 'max-w-56', 'flex', 'flex-col', 'p-2', 'bg-slate-500', 'break-words')
-    //     newMessage.innerHTML = `
-    //             < small class='opacity-65 text-xs' > ${ user.email }</ >
-    //                 <p class='text-sm'>${message}</p>
-    //         `
-    //     messageBox.appendChild(newMessage);
-    //     scrollToBottom();
-    // }
 
     useEffect(() => {
         scrollToBottom();
@@ -312,8 +265,11 @@ const Project = () => {
                         {
                             Object.keys(fileTree).map((file, index) => (
                                 <button
-                                    onClick={() => setCurrentFile(file)}
-                                    className='tree-element cursor-pointer p-2 px-4  flex items-center gap-2 bg-slate-300 w-full'>
+                                    onClick={() => {
+                                        setCurrentFile(file)
+                                        setOpenFiles([ ...new Set([ ...openFiles, file ])])
+                                    }}
+                                    className='tree-element cursor-pointer p-2 px-4 flex items-center gap-2 bg-slate-300 w-full'>
                                     <p
                                         className='font-semibold text-lg'
                                     >{file}</p>
@@ -323,20 +279,45 @@ const Project = () => {
 
                     </div>
                 </div>
-                <div className='code-editor'>
-                    
-                    {
-                        currentFile && (
-                            <div className="code-editor-header flex justify-between items-center p-2 bg-slate-200">
-                                <h1 className='font-semibold text-lg'>{currentFile}</h1>
-                                <button className='p-2' onClick={() => setCurrentFile(null)}>
-                                    <i className="ri-close-fill"></i>
-                                </button>
-                            </div>
-                        )
-                    }
+                {currentFile && (
+                    <div className='code-editor flex flex-col flex-grow h-full bg-slate-50'>
 
-                </div>
+                        <div className='top flex '>
+                            {
+                                openFiles.map((file, index) => (
+                                    <button
+                                        onClick={() => setCurrentFile(file)}
+                                        className={`open-file cursor-pointer p-2 px-4 flex items-center w-fit gap-2 bg-slate-300 ${currentFile === file ? 'bg-slate-400' : ''}`}>
+                                        <p
+                                            className='font-semibold text-lg'
+                                        >{file}</p>
+                                    </button>
+                                ))
+                            }
+                        </div>
+                        <div className='bottom flex flex-grow'>
+                            {
+                                fileTree[currentFile] && (
+                                    <textarea
+                                        value={fileTree[currentFile].content}
+                                        onChange={(e) => {
+                                            setFileTree({
+                                                ...fileTree,
+                                                [currentFile]: {
+                                                    content: e.target.value
+                                                }
+                                            })
+                                        }}
+                                        className='w-full h-full p-4 bg-slate-50 outline-none'
+                                    ></textarea>
+                                )
+                            }
+                        </div>
+
+
+
+                    </div>
+                )}
 
             </section>
 
