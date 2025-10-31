@@ -23,12 +23,12 @@ const Project = () => {
     const [users, setUsers] = useState([]);
     const [messages, setMessages] = useState([]);
     const [fileTree, setFileTree] = useState({
-        "app.js": {
-            content: `const express = require('express');`
-        },
-        "package.json": {
-            content: `{"name":"temp-server"}`
-        }
+        // "app.js": {
+        //     content: `const express = require('express');`
+        // },
+        // "package.json": {
+        //     content: `{"name":"temp-server"}`
+        // }
     })
 
     const [currentFile, setCurrentFile] = useState(null);
@@ -119,7 +119,15 @@ const Project = () => {
 
         const handleMessage = (data) => {
             // console.log(data);
+            console.log(JSON.parse(data.message));
             // appendIncomingMessage(data)
+
+            const message = JSON.parse(data.message);
+
+            if (message.fileTree) {
+                setFileTree(message.fileTree);
+            }
+
             setMessages(prevMessages => [...prevMessages, data]);
         }
 
@@ -193,12 +201,12 @@ const Project = () => {
                                     {msg.sender.email}
                                 </small>
 
-                                <p className='text-sm'>
-                                    {msg.sender._id === 'ai' ?
 
-                                        WriteAiMessage(msg.message)
-                                        : msg.message}
-                                </p>
+                                {msg.sender._id === 'ai' ?
+
+                                    WriteAiMessage(msg.message)
+                                    : <p className='text-sm'>{msg.message}</p>
+                                }
                             </div>
                         ))}
 
@@ -267,7 +275,7 @@ const Project = () => {
                                 <button
                                     onClick={() => {
                                         setCurrentFile(file)
-                                        setOpenFiles([ ...new Set([ ...openFiles, file ])])
+                                        setOpenFiles([...new Set([...openFiles, file])])
                                     }}
                                     className='tree-element cursor-pointer p-2 px-4 flex items-center gap-2 bg-slate-300 w-full'>
                                     <p
@@ -308,7 +316,7 @@ const Project = () => {
                                                 }
                                             })
                                         }}
-                                        className='w-full h-full p-4 bg-slate-50 outline-none'
+                                        className='code-editor-area w-full h-full p-4 overflow-auto flex-grow bg-slate-800 text-white outline-none'
                                     ></textarea>
                                 )
                             }

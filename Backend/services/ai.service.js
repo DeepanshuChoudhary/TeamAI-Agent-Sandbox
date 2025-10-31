@@ -52,10 +52,9 @@ export const generateResult = async (prompt) => {
 
                             content : "{
                                 {
-                                    "name": "temp-server",
+                                    "name": "test",
                                     "version": "1.0.0",
-                                    "main": "server.js",
-                                    "type": "module",
+                                    "main": "app.js",
                                     "scripts": {
                                         "test": "echo \"Error: no test specified\" && exit 1"
                                     },
@@ -64,39 +63,25 @@ export const generateResult = async (prompt) => {
                                     "license": "ISC",
                                     "description": "",
                                     "dependencies": {
-                                        "@google/genai": "^1.27.0",
-                                        "bcrypt": "^6.0.0",
-                                        "bcryptjs": "^3.0.2",
-                                        "cookie-parser": "^1.4.7",
-                                        "cors": "^2.8.5",
-                                        "dotenv": "^17.2.3",
-                                        "express": "^5.1.0",
-                                        "express-validator": "^7.2.1",
-                                        "ioredis": "^5.8.1",
-                                        "jsonwebtoken": "^9.0.2",
-                                        "mongoose": "^8.19.0",
-                                        "morgan": "^1.10.1",
-                                        "router": "^2.2.0",
-                                        "routes": "^2.1.0",
-                                        "socket.io": "^4.8.1"
+                                        "express": "^5.1.0"
                                     }
                                 }
-                                    ",
+                                    ",  
                                 
-                                "buildCommand": {
-                                    mainItem: "npm",
-                                    commands: ["install"]
-                                },
-
-                                "startCommand": {
-                                    mainItem:"node",
-                                    commands:["app.js"]
-                                }
-
+                                    
                             }
-
-                        }
-                    }
+                                    
+                        },
+                    },
+                    "buildCommand": {
+                        mainItem: "npm",
+                        commands: ["install"]
+                    },
+    
+                    "startCommand": {
+                        mainItem:"node",
+                        commands:["app.js"]
+                    },
                 }
 
             </exmaple>
