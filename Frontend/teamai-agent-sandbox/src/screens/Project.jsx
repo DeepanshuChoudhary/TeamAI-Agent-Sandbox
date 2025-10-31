@@ -118,7 +118,7 @@ const Project = () => {
         initializeSocket(project._id);
 
         const handleMessage = (data) => {
-            // console.log(data);
+            console.log(data);
             console.log(JSON.parse(data.message));
             // appendIncomingMessage(data)
 
