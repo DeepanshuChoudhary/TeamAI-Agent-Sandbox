@@ -305,6 +305,7 @@ const Project = () => {
 
                     </div>
                 </div>
+                
                 {currentFile && (
                     <div className='code-editor flex flex-col flex-grow h-full bg-slate-50 shrink'>
 
@@ -376,6 +377,7 @@ const Project = () => {
 
 
                     </div>
+                
                 )}
 
             </section>
