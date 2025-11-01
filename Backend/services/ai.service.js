@@ -34,7 +34,7 @@ export const generateResult = async (prompt) => {
                     "text":"This is your fileTree structure of the express server".
                     "fileTree":" {
                         "app.js": {
-                            content: "
+                            contents: "
                                 const express = require('express');
 
                                 const app = express();
@@ -50,7 +50,7 @@ export const generateResult = async (prompt) => {
                         },
                         "package.json": {
 
-                            content : "{
+                            contents : "{
                                 {
                                     "name": "test",
                                     "version": "1.0.0",

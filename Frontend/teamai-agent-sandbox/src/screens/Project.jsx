@@ -5,6 +5,8 @@ import { initializeSocket, receiveMessage, sendMessage } from '../config/socket.
 import { UserContext } from '../context/user.context.jsx'
 import Markdown from 'markdown-to-jsx';
 import { useRef } from 'react';
+import hljs from 'highlight.js';
+import 'highlight.js/styles/github.css';
 
 const Project = () => {
 
@@ -19,6 +21,7 @@ const Project = () => {
     const [message, setMessage] = useState('');
     const { user } = useContext(UserContext);
     const messageBox = React.createRef();
+    // const messageBox = useRef(null);
 
     const [users, setUsers] = useState([]);
     const [messages, setMessages] = useState([]);
@@ -288,7 +291,7 @@ const Project = () => {
                     </div>
                 </div>
                 {currentFile && (
-                    <div className='code-editor flex flex-col flex-grow h-full bg-slate-50'>
+                    <div className='code-editor flex flex-col flex-grow h-full bg-slate-50 shrink'>
 
                         <div className='top flex '>
                             {
@@ -303,9 +306,42 @@ const Project = () => {
                                 ))
                             }
                         </div>
-                        <div className='bottom flex flex-grow'>
+                        <div className='bottom flex flex-grow max-w-full shrink overflow-auto'>
                             {
+
                                 fileTree[currentFile] && (
+                                    <div className="code-editor-area h-full overflow-auto flex-grow bg-slate-50">
+                                        <pre className="hljs h-full p-2">
+                                            <code
+                                                className="hljs h-full outline-none"
+                                                contentEditable
+                                                suppressContentEditableWarning
+                                                onBlur={(e) => {
+                                                    const updatedContent = e.target.innerText;
+                                                    setFileTree(prevFileTree => ({
+                                                        ...prevFileTree,
+                                                        [currentFile]: {
+                                                            ...prevFileTree[currentFile],
+                                                            content: updatedContent,
+                                                        },
+                                                    }));
+                                                }}
+                                                dangerouslySetInnerHTML={{
+                                                    __html: hljs.highlight('javascript', fileTree[currentFile].contents).value
+                                                }}
+                                                style={{
+                                                    whiteSpace: 'pre-wrap',
+                                                    paddingBottom: '25rem',
+                                                    counterSet: 'line-numbering',
+                                                }}
+                                            />
+                                        </pre>
+                                    </div>
+                                )
+
+
+
+                                /*fileTree[currentFile] && (
                                     <textarea
                                         value={fileTree[currentFile].content}
                                         onChange={(e) => {
@@ -318,7 +354,7 @@ const Project = () => {
                                         }}
                                         className='code-editor-area w-full h-full p-4 overflow-auto flex-grow bg-slate-800 text-white outline-none'
                                     ></textarea>
-                                )
+                                )*/
                             }
                         </div>
 
