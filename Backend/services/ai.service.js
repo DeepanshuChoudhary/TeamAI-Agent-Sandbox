@@ -34,6 +34,7 @@ export const generateResult = async (prompt) => {
                     "text":"This is your fileTree structure of the express server".
                     "fileTree":" {
                         "app.js": {
+                        file: {
                             contents: "
                                 const express = require('express');
 
@@ -47,26 +48,29 @@ export const generateResult = async (prompt) => {
                                     console.log('Server is running on port 3000')
                                 })
                             "
+                        }
                         },
                         "package.json": {
-
-                            contents : "{
-                                {
-                                    "name": "test",
-                                    "version": "1.0.0",
-                                    "main": "app.js",
-                                    "scripts": {
-                                        "test": "echo \"Error: no test specified\" && exit 1"
-                                    },
-                                    "keywords": [],
-                                    "author": "",
-                                    "license": "ISC",
-                                    "description": "",
-                                    "dependencies": {
-                                        "express": "^5.1.0"
+                            file: {
+                                contents : "{
+                                    {
+                                        "name": "test",
+                                        "version": "1.0.0",
+                                        "main": "app.js",
+                                        "scripts": {
+                                            "test": "echo \"Error: no test specified\" && exit 1"
+                                        },
+                                        "keywords": [],
+                                        "author": "",
+                                        "license": "ISC",
+                                        "description": "",
+                                        "dependencies": {
+                                            "express": "^5.1.0"
+                                        }
                                     }
-                                }
-                                    ",  
+                                        ",  
+                            }
+
                                 
                                     
                             }

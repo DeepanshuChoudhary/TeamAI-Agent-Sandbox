@@ -7,6 +7,21 @@ import Markdown from 'markdown-to-jsx';
 import { useRef } from 'react';
 import hljs from 'highlight.js';
 import 'highlight.js/styles/github.css';
+import { getWebContainer } from '../config/webContainer.js';
+
+const SyntaxHighlightedCode = (props) => {
+    const ref = useRef(null)
+
+    React.useEffect(() => {
+        if (ref.current && props.className?.includes('lang-') && window.hljs) {
+            window.hljs.highlightElement(ref.current)
+
+            ref.current.removeAttribute('data-highlighted')
+        }
+    }, [props.className, props.children])
+
+    return <code {...props} ref={ref} />
+}
 
 const Project = () => {
 
@@ -37,6 +52,8 @@ const Project = () => {
     const [currentFile, setCurrentFile] = useState(null);
     const [openFiles, setOpenFiles] = useState([]);
 
+    const [webContainer, setWebContainer] = useState(null);
+
     const handleUserClick = (id) => {
         setSelectedUserId(prevSelectedUserId => {
             const newSelectedUserId = new Set(prevSelectedUserId);
@@ -53,19 +70,6 @@ const Project = () => {
 
     // console.log(location.state)
 
-    const SyntaxHighlightedCode = (props) => {
-        const ref = useRef(null)
-
-        React.useEffect(() => {
-            if (ref.current && props.className?.includes('lang-') && window.hljs) {
-                window.hljs.highlightElement(ref.current)
-
-                ref.current.removeAttribute('data-highlighted')
-            }
-        }, [props.className, props.children])
-
-        return <code {...props} ref={ref} />
-    }
 
     const addCollaborators = () => {
 
@@ -120,12 +124,23 @@ const Project = () => {
 
         initializeSocket(project._id);
 
+        if(!webContainer) {
+            getWebContainer().then(container => {
+                setWebContainer(container)
+                console.log('Container Started')
+            })
+        }
+
         const handleMessage = (data) => {
-            console.log(data);
-            console.log(JSON.parse(data.message));
+            // console.log(data);
+            // console.log(JSON.parse(data.message));
             // appendIncomingMessage(data)
 
             const message = JSON.parse(data.message);
+
+            console.log(message);
+
+            webContainer?.mount(message.fileTree);
 
             if (message.fileTree) {
                 setFileTree(message.fileTree);
@@ -327,7 +342,7 @@ const Project = () => {
                                                     }));
                                                 }}
                                                 dangerouslySetInnerHTML={{
-                                                    __html: hljs.highlight('javascript', fileTree[currentFile].contents).value
+                                                    __html: hljs.highlight('javascript', fileTree[currentFile].file.contents).value
                                                 }}
                                                 style={{
                                                     whiteSpace: 'pre-wrap',
