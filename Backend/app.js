@@ -22,7 +22,7 @@ app.use('/users', userRoutes);
 app.use('/projects', projectRoutes);
 
 app.get('/', (req,res) => {
-    res.send('Hello world')
+    res.send('Hello world this is backend')
 })
 
 export default app;

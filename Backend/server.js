@@ -7,7 +7,7 @@ import mongoose from 'mongoose';
 import projectModel from './models/project.model.js';
 import { generateResult } from './services/ai.service.js';
 
-const port = process.env.PORT || 3000
+const port = process.env.PORT || 8080
 
 
 const server = http.createServer(app);
@@ -81,8 +81,18 @@ io.on('connection', socket => {
 
             const result = await generateResult(prompt);
 
+            let aiResponse;
+            try {
+                aiResponse = JSON.parse(result);
+            }
+            catch(err) {
+                console.error('Failed to parse AI response', err);
+                aiResponse = { text: "Sorry, I couldn't process that request."};
+            }
+
             io.to(socket.roomId).emit('project-message', {
-                message: result,
+                // message: result,
+                message: JSON.stringify(aiResponse),
                 sender: {
                     _id: 'ai',
                     email: 'AI'

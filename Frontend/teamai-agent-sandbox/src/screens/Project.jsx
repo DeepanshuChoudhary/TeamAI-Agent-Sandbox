@@ -124,7 +124,7 @@ const Project = () => {
 
         initializeSocket(project._id);
 
-        if(!webContainer) {
+        if (!webContainer) {
             getWebContainer().then(container => {
                 setWebContainer(container)
                 console.log('Container Started')
@@ -132,7 +132,7 @@ const Project = () => {
         }
 
         const handleMessage = (data) => {
-            // console.log(data);
+            console.log(data);
             // console.log(JSON.parse(data.message));
             // appendIncomingMessage(data)
 
@@ -305,11 +305,12 @@ const Project = () => {
 
                     </div>
                 </div>
-                
-                {currentFile && (
-                    <div className='code-editor flex flex-col flex-grow h-full bg-slate-50 shrink'>
 
-                        <div className='top flex '>
+                <div className='code-editor flex flex-col flex-grow h-full bg-slate-50 shrink'>
+
+                    <div className='top flex justify-between w-full'>
+                        
+                        <div className='files flex'>
                             {
                                 openFiles.map((file, index) => (
                                     <button
@@ -322,63 +323,122 @@ const Project = () => {
                                 ))
                             }
                         </div>
-                        <div className='bottom flex flex-grow max-w-full shrink overflow-auto'>
-                            {
 
-                                fileTree[currentFile] && (
-                                    <div className="code-editor-area h-full overflow-auto flex-grow bg-slate-50">
-                                        <pre className="hljs h-full p-2">
-                                            <code
-                                                className="hljs h-full outline-none"
-                                                contentEditable
-                                                suppressContentEditableWarning
-                                                onBlur={(e) => {
-                                                    const updatedContent = e.target.innerText;
-                                                    setFileTree(prevFileTree => ({
-                                                        ...prevFileTree,
-                                                        [currentFile]: {
-                                                            ...prevFileTree[currentFile],
-                                                            content: updatedContent,
-                                                        },
-                                                    }));
-                                                }}
-                                                dangerouslySetInnerHTML={{
-                                                    __html: hljs.highlight('javascript', fileTree[currentFile].file.contents).value
-                                                }}
-                                                style={{
-                                                    whiteSpace: 'pre-wrap',
-                                                    paddingBottom: '25rem',
-                                                    counterSet: 'line-numbering',
-                                                }}
-                                            />
-                                        </pre>
-                                    </div>
-                                )
+                        <div className='actions flex gap-2'>
+                            <button
+                                onClick={async () => {
 
+                                    await webContainer.mount(fileTree);
 
+                                    const installProcess = await webContainer.spawn("npm", ["install"]);
 
-                                /*fileTree[currentFile] && (
-                                    <textarea
-                                        value={fileTree[currentFile].content}
-                                        onChange={(e) => {
-                                            setFileTree({
-                                                ...fileTree,
-                                                [currentFile]: {
-                                                    content: e.target.value
-                                                }
-                                            })
-                                        }}
-                                        className='code-editor-area w-full h-full p-4 overflow-auto flex-grow bg-slate-800 text-white outline-none'
-                                    ></textarea>
-                                )*/
-                            }
+                                    installProcess.output.pipeTo(new WritableStream ({
+                                        write(chunk) {
+                                            console.log(chunk);
+                                        }
+                                    }))
+
+                                    const runProcess = await webContainer.spawn("npm", ["start"]);
+
+                                    runProcess.output.pipeTo(new WritableStream ({
+                                        write(chunk) {
+                                            console.log(chunk);
+                                        }
+                                    }))
+
+                                    // await webContainer?.mount(fileTree); 
+
+                                    // console.log('Installing dependencies...');
+                                    // const installProcess = await webContainer?.spawn("npm", [ "install" ])
+
+                                    // installProcess.output.pipeTo(new WritableStream({
+                                    //     write(chunk) {
+                                    //         console.log(chunk);
+                                    //     }
+                                    // }))
+
+                                    // const installExitCode = await installProcess.exit;
+
+                                    // if(installExitCode !== 0) {
+                                    //     console.log('Install failed with exit code: ', installExitCode);
+                                    //     return;
+                                    // }
+
+                                    // console.log('Dependencies installed successfully');
+                                    
+                                    // console.log('Starting server...');
+                                    // const runProcess = await webContainer?.spawn("npm", [ "start" ])
+                                    
+                                    
+
+                                    // runProcess.output.pipeTo(new WritableStream({
+                                    //     write(chunk) {
+                                    //         console.log(chunk)
+                                    //     }
+                                    // }))
+                                }}
+                                className='p-2 px-4 bg-slate-300 text-white cursor-pointer'
+                            >
+                                run
+                            </button>
                         </div>
 
-
-
                     </div>
-                
-                )}
+                    <div className='bottom flex flex-grow max-w-full shrink overflow-auto'>
+                        {
+
+                            fileTree[currentFile] && (
+                                <div className="code-editor-area h-full overflow-auto flex-grow bg-slate-50">
+                                    <pre className="hljs h-full p-2">
+                                        <code
+                                            className="hljs h-full outline-none"
+                                            contentEditable
+                                            suppressContentEditableWarning
+                                            onBlur={(e) => {
+                                                const updatedContent = e.target.innerText;
+                                                setFileTree(prevFileTree => ({
+                                                    ...prevFileTree,
+                                                    [currentFile]: {
+                                                        ...prevFileTree[currentFile],
+                                                        content: updatedContent,
+                                                    },
+                                                }));
+                                            }}
+                                            dangerouslySetInnerHTML={{
+                                                __html: hljs.highlight('javascript', fileTree[currentFile].file.contents).value
+                                            }}
+                                            style={{
+                                                whiteSpace: 'pre-wrap',
+                                                paddingBottom: '25rem',
+                                                counterSet: 'line-numbering',
+                                            }}
+                                        />
+                                    </pre>
+                                </div>
+                            )
+
+
+
+                            /*fileTree[currentFile] && (
+                                <textarea
+                                    value={fileTree[currentFile].content}
+                                    onChange={(e) => {
+                                        setFileTree({
+                                            ...fileTree,
+                                            [currentFile]: {
+                                                content: e.target.value
+                                            }
+                                        })
+                                    }}
+                                    className='code-editor-area w-full h-full p-4 overflow-auto flex-grow bg-slate-800 text-white outline-none'
+                                ></textarea>
+                            )*/
+                        }
+                    </div>
+
+
+
+                </div>
 
             </section>
 

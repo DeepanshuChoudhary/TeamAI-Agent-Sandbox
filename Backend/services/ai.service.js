@@ -9,7 +9,7 @@ export const generateResult = async (prompt) => {
         model: "gemini-2.5-flash",
         contents: prompt,
         config: {
-            temperature: 0.7,
+            temperature: 0.4,
             responseMimeType: "application/json",
             // responseSchema: {
             //     type:"object",
@@ -96,6 +96,8 @@ export const generateResult = async (prompt) => {
                     "text": "Hello, How can i help you today deepengineeryt@gmail.com"
                 }
             </exmaple>
+
+            IMPORTANT: don't use file name like routes/index.js
 
             `
         }
