@@ -97,7 +97,7 @@ export const generateResult = async (prompt) => {
                 }
             </exmaple>
 
-            IMPORTANT: don't use file name like routes/index.js
+            IMPORTANT: don't use file name like routes/index.js also do not put files in src folder or any kind of folder
 
             `
         }
