@@ -325,7 +325,7 @@ const Project = () => {
                         </div>
 
                         <div className='actions flex gap-2'>
-                            <button
+                            <button     // ISSUE IN WORKING
                                 onClick={async () => {
 
                                     await webContainer.mount(fileTree);
@@ -379,7 +379,7 @@ const Project = () => {
                                 }}
                                 className='p-2 px-4 bg-slate-300 text-white cursor-pointer'
                             >
-                                run
+                                run     
                             </button>
                         </div>
 
